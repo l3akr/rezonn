@@ -132,7 +132,7 @@ function renderHome() {
   app.innerHTML = `
     <section class="hero">
       <h1 class="hero-word">REZONN</h1>
-      <p class="hero-note">Identité typographique — à venir</p>
+      <p class="hero-note">Typo à venir</p>
       <p class="hero-tagline">Photographie — Séries — Tirages</p>
       <button class="hero-scroll" id="heroScroll">DÉFILER</button>
     </section>
