@@ -9,8 +9,8 @@
   --fg-muted: #8d8f93;
   --fg-faint: #58595c;
   --line: #333438;
-  --accent: #40185D;
-  --accent-dim: #6e5a3b;
+  --accent: #40185d;
+  --accent-dim: #2a0f3d;
 
   --font-display: 'Big Shoulders Display', sans-serif;
   --font-body: 'Inter', sans-serif;
@@ -35,7 +35,7 @@ ul{ list-style: none; margin:0; padding:0; }
 button{ font-family: inherit; background:none; border:none; color: inherit; cursor:pointer; }
 img{ max-width:100%; display:block; }
 
-::selection{ background: var(--accent); color: var(--bg); }
+::selection{ background: var(--accent); color: var(--fg); }
 
 @media (prefers-reduced-motion: reduce){
   *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
@@ -539,7 +539,7 @@ img{ max-width:100%; display:block; }
 .print-buy.is-added{
   background: var(--accent);
   border-color: var(--accent);
-  color: var(--bg);
+  color: var(--fg);
 }
 .print-card{ padding-bottom: 6px; }
 
