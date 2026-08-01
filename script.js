@@ -29,16 +29,12 @@ const FALLBACK_SERIES = {
       { title: 'NOCTURNES', sub: 'FAUNE — SÉRIE 02 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
       { title: 'LITTORAL', sub: 'FAUNE — SÉRIE 03 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
     ]
-  },
-  archives: {
-    label: 'ARCHIVES', tone: 'archives', meta: '3 SÉRIES — 2019 → 2024',
-    series: [
-      { title: '2019 — 2021', sub: 'ARCHIVES — SÉRIE 01 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
-      { title: 'PREMIERS TIRAGES', sub: 'ARCHIVES — SÉRIE 02 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
-      { title: 'INÉDITES', sub: 'ARCHIVES — SÉRIE 03 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
-    ]
   }
 };
+
+/* ARCHIVES : pas de séries, une galerie plate — les photos vont directement
+   à la racine de photos/archives/ (pas de sous-dossier). */
+const FALLBACK_ARCHIVES = { label: 'ARCHIVES', tone: 'archives', meta: 'GALERIE', count: 8 };
 
 const FALLBACK_PRINTS = [
   { name: 'NUIT BLANCHE — 04', format: '30×40 CM — ÉD. 25', price: '—', image: null },
@@ -52,6 +48,7 @@ const FALLBACK_PRINTS = [
 ];
 
 const FRAME_CLASSES = ['f-a', 'f-b', 'f-c', 'f-d'];
+const FLAT_CATEGORIES = ['archives'];
 const INSTAGRAM_URL = 'https://www.instagram.com/re__zonn/';
 
 /* Données effectives, complétées au chargement par manifest.json si présent */
@@ -89,6 +86,19 @@ function mergeData(manifest) {
     };
   });
 
+  FLAT_CATEGORIES.forEach(key => {
+    const fb = FALLBACK_ARCHIVES;
+    const real = manifest && Array.isArray(manifest[key]) ? manifest[key] : [];
+    DATA[key] = {
+      label: fb.label,
+      tone: fb.tone,
+      flat: true,
+      meta: real.length ? `${real.length} PHOTO${real.length > 1 ? 'S' : ''}` : fb.meta,
+      images: real.length ? real : null,
+      count: fb.count
+    };
+  });
+
   const realPrints = manifest && Array.isArray(manifest.prints) ? manifest.prints : [];
   PRINTS_DATA = realPrints.length
     ? realPrints.map(p => ({ name: p.title, format: p.format, price: p.price, image: p.image }))
@@ -112,6 +122,7 @@ function media(src, tone, frameLabel) {
    ============================================ */
 function categoryCover(key) {
   const cat = DATA[key];
+  if (cat.flat) return cat.images ? cat.images[0] : null;
   const first = cat.series[0];
   if (first && first.images && first.images.length) return first.images[0];
   return null;
@@ -169,6 +180,19 @@ function renderCategory(key) {
   const cat = DATA[key];
   if (!cat) { renderHome(); return; }
 
+  if (cat.flat) {
+    app.innerHTML = `
+      <div class="view">
+        <div class="cat-header">
+          <h1 class="cat-title">${cat.label}</h1>
+          <div class="cat-meta"><span>${cat.meta}</span></div>
+        </div>
+        <div class="series-grid flat-grid">${flatFramesHtml(cat)}</div>
+      </div>
+    `;
+    return;
+  }
+
   app.innerHTML = `
     <div class="view">
       <div class="cat-header">
@@ -186,6 +210,17 @@ function renderCategory(key) {
       head.closest('.series-item').classList.toggle('is-open');
     });
   });
+}
+
+function flatFramesHtml(cat) {
+  const hasImages = Array.isArray(cat.images) && cat.images.length > 0;
+  const count = hasImages ? cat.images.length : cat.count;
+  return Array.from({ length: count }).map((_, idx) => {
+    const cls = FRAME_CLASSES[idx % FRAME_CLASSES.length];
+    const src = hasImages ? cat.images[idx] : null;
+    const label = String(idx + 1).padStart(2, '0');
+    return `<div class="frame ${cls}">${media(src, cat.tone, label)}</div>`;
+  }).join('');
 }
 
 function seriesItem(tone, series, i) {

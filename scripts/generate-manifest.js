@@ -20,7 +20,8 @@ const PHOTOS_DIR = path.join(ROOT, 'photos');
 const OUTPUT = path.join(ROOT, 'manifest.json');
 
 const IMAGE_EXT = /\.(jpe?g|png|webp)$/i;
-const SERIES_CATEGORIES = ['club', 'shooting', 'faune', 'archives'];
+const SERIES_CATEGORIES = ['club', 'shooting', 'faune'];
+const FLAT_CATEGORIES = ['archives'];
 
 function titleize(name) {
   return name.replace(/[-_]+/g, ' ').trim().toUpperCase();
@@ -45,6 +46,11 @@ function buildSeriesCategory(key) {
       return { title: titleize(folder), images };
     })
     .filter(s => s.images.length > 0);
+}
+
+function buildFlatCategory(key) {
+  const dir = path.join(PHOTOS_DIR, key);
+  return listImages(dir).map(f => `photos/${key}/${f}`);
 }
 
 function buildPrints() {
@@ -74,6 +80,7 @@ function buildPrints() {
 
 const manifest = {};
 SERIES_CATEGORIES.forEach(key => { manifest[key] = buildSeriesCategory(key); });
+FLAT_CATEGORIES.forEach(key => { manifest[key] = buildFlatCategory(key); });
 manifest.prints = buildPrints();
 
 fs.writeFileSync(OUTPUT, JSON.stringify(manifest, null, 2));
