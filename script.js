@@ -123,13 +123,17 @@ function renderHome() {
       <h1 class="hero-word">REZONN</h1>
       <p class="hero-note">Identité typographique — à venir</p>
       <p class="hero-tagline">Photographie — Séries — Tirages</p>
-      <div class="hero-scroll">DÉFILER</div>
+      <button class="hero-scroll" id="heroScroll">DÉFILER</button>
     </section>
 
     <section class="cat-grid view">
       ${tilesHtml()}
     </section>
   `;
+
+  document.getElementById('heroScroll').addEventListener('click', () => {
+    document.querySelector('.cat-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 }
 
 function tilesHtml() {
@@ -296,13 +300,15 @@ function updateActiveTile(hash) {
    Menu plein écran
    ============================================ */
 const menuToggle = document.getElementById('menuToggle');
+const menuToggleLabel = menuToggle.querySelector('.menu-toggle-label');
 const menuOverlay = document.getElementById('menuOverlay');
-const menuClose = document.getElementById('menuClose');
+const headerWordmark = document.getElementById('headerWordmark');
 
 function openMenu() {
   menuOverlay.classList.add('is-open');
   menuOverlay.setAttribute('aria-hidden', 'false');
   menuToggle.setAttribute('aria-expanded', 'true');
+  menuToggleLabel.textContent = 'CLOSE';
   document.body.style.overflow = 'hidden';
 }
 
@@ -310,14 +316,16 @@ function closeMenu() {
   menuOverlay.classList.remove('is-open');
   menuOverlay.setAttribute('aria-hidden', 'true');
   menuToggle.setAttribute('aria-expanded', 'false');
+  menuToggleLabel.textContent = 'MENU';
   document.body.style.overflow = '';
 }
 
 menuToggle.addEventListener('click', () => {
   menuOverlay.classList.contains('is-open') ? closeMenu() : openMenu();
 });
-menuClose.addEventListener('click', closeMenu);
-menuOverlay.querySelector('.menu-overlay-bar .wordmark').addEventListener('click', closeMenu);
+headerWordmark.addEventListener('click', () => {
+  if (menuOverlay.classList.contains('is-open')) closeMenu();
+});
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeMenu();
 });
