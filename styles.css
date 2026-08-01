@@ -125,51 +125,86 @@ img{ max-width:100%; display:block; }
   opacity: 0.85;
   text-transform: uppercase;
 }
-.nav-toggle{
-  display:none;
+.menu-toggle{
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.15em;
   border: 1px solid var(--line);
-  padding: 8px 14px;
-}
-.main-nav .nav-list{
-  display:flex; gap: 30px;
-}
-.main-nav a{
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  padding-bottom: 4px;
-  border-bottom: 1px solid transparent;
+  padding: 8px 16px;
   transition: border-color 0.25s ease, color 0.25s ease;
 }
-.main-nav a:hover, .main-nav a.is-active{
-  border-color: var(--accent);
-  color: var(--accent);
+.menu-toggle:hover{ border-color: var(--accent); color: var(--accent); }
+
+/* ============================================
+   Menu plein écran — photo par catégorie
+   ============================================ */
+.menu-overlay{
+  position: fixed; inset:0;
+  z-index: 700;
+  background: var(--bg);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
+  overflow-y: auto;
 }
-.nav-index{
+.menu-overlay.is-open{
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+.menu-overlay-bar{
+  height: var(--header-h);
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 28px;
+}
+.menu-close{
   font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--fg-faint);
-  vertical-align: super;
-  margin-right: 3px;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  transition: opacity 0.25s ease;
+}
+.menu-close:hover{ opacity: 0.7; }
+
+.menu-grid{
+  display:grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: 12vw;
+  gap: 3px;
+  padding: 3px;
+  min-height: calc(100vh - var(--header-h));
 }
 
+/* les photos des tuiles du menu restent masquées par défaut sur PC,
+   et n'apparaissent qu'au survol — toujours visibles sur mobile (cf. media query plus bas) */
+#menuGrid .cat-tile .ph,
+#menuGrid .cat-tile .shot-img{
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.6s ease;
+}
+#menuGrid .cat-tile:hover .ph,
+#menuGrid .cat-tile:hover .shot-img{
+  opacity: 1;
+}
+#menuGrid .cat-tile::after{
+  /* voile sombre pour garder le label lisible même si l'image apparaît */
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0) 60%);
+  z-index:1;
+  opacity:0;
+  transition: opacity 0.4s ease;
+}
+#menuGrid .cat-tile:hover::after{ opacity: 1; }
+
+#menuGrid .cat-tile.is-active .cat-tile-label{ color: var(--accent); }
+
 @media (max-width: 760px){
-  .nav-toggle{ display:block; }
-  .main-nav{
-    position: fixed;
-    top: var(--header-h); left:0; right:0; bottom:0;
-    background: var(--bg);
-    transform: translateY(-100%);
-    transition: transform 0.35s ease;
-    z-index: 400;
-    padding: 40px 28px;
-  }
-  .main-nav.is-open{ transform: translateY(0); }
-  .main-nav .nav-list{ flex-direction:column; gap: 26px; }
-  .main-nav a{ font-size: 22px; font-family: var(--font-display); font-weight:600; letter-spacing:0.04em; }
+  .menu-grid{ grid-template-columns: repeat(2,1fr); grid-auto-rows: 42vw; }
+  #menuGrid .cat-tile .ph,
+  #menuGrid .cat-tile .shot-img{ opacity: 1 !important; }
+  #menuGrid .cat-tile::after{ opacity: 0.75 !important; }
 }
 
 /* ============================================

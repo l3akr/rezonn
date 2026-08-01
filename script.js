@@ -127,14 +127,24 @@ function renderHome() {
     </section>
 
     <section class="cat-grid view">
-      ${catTile('club', 'CLUB', '01')}
-      ${catTile('shooting', 'SHOOTING', '02')}
-      ${catTile('faune', 'FAUNE', '03')}
-      ${catTile('prints', 'PRINTS', '04')}
-      ${catTile('archives', 'ARCHIVES', '05')}
-      ${catTile('contact', 'CONTACT', '06')}
+      ${tilesHtml()}
     </section>
   `;
+}
+
+function tilesHtml() {
+  return [
+    catTile('club', 'CLUB', '01'),
+    catTile('shooting', 'SHOOTING', '02'),
+    catTile('faune', 'FAUNE', '03'),
+    catTile('prints', 'PRINTS', '04'),
+    catTile('archives', 'ARCHIVES', '05'),
+    catTile('contact', 'CONTACT', '06'),
+  ].join('');
+}
+
+function renderMenuGrid() {
+  document.getElementById('menuGrid').innerHTML = tilesHtml();
 }
 
 function catTile(key, label, index) {
@@ -272,31 +282,45 @@ function router() {
   const render = ROUTES[hash] || renderHome;
   render();
   window.scrollTo(0, 0);
-  updateActiveNav(hash);
-  closeMobileNav();
+  updateActiveTile(hash);
+  closeMenu();
 }
 
-function updateActiveNav(hash) {
-  document.querySelectorAll('.main-nav a').forEach(a => {
-    a.classList.toggle('is-active', a.getAttribute('href') === '#' + hash);
+function updateActiveTile(hash) {
+  document.querySelectorAll('#menuGrid .cat-tile').forEach(tile => {
+    tile.classList.toggle('is-active', tile.getAttribute('href') === '#' + hash);
   });
 }
 
 /* ============================================
-   Navigation mobile
+   Menu plein écran
    ============================================ */
-const navToggle = document.getElementById('navToggle');
-const mainNav = document.getElementById('mainNav');
+const menuToggle = document.getElementById('menuToggle');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuClose = document.getElementById('menuClose');
 
-navToggle.addEventListener('click', () => {
-  const open = mainNav.classList.toggle('is-open');
-  navToggle.setAttribute('aria-expanded', open);
-});
-
-function closeMobileNav() {
-  mainNav.classList.remove('is-open');
-  navToggle.setAttribute('aria-expanded', false);
+function openMenu() {
+  menuOverlay.classList.add('is-open');
+  menuOverlay.setAttribute('aria-hidden', 'false');
+  menuToggle.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
 }
+
+function closeMenu() {
+  menuOverlay.classList.remove('is-open');
+  menuOverlay.setAttribute('aria-hidden', 'true');
+  menuToggle.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
+}
+
+menuToggle.addEventListener('click', () => {
+  menuOverlay.classList.contains('is-open') ? closeMenu() : openMenu();
+});
+menuClose.addEventListener('click', closeMenu);
+menuOverlay.querySelector('.menu-overlay-bar .wordmark').addEventListener('click', closeMenu);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeMenu();
+});
 
 /* ============================================
    Init — on attend le manifest (+ durée minimale du
@@ -310,6 +334,7 @@ window.addEventListener('hashchange', router);
 window.addEventListener('DOMContentLoaded', async () => {
   const [manifest] = await Promise.all([loadManifest(), wait(900)]);
   mergeData(manifest);
+  renderMenuGrid();
   router();
   document.getElementById('loader').classList.add('is-hidden');
 });
