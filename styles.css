@@ -473,6 +473,13 @@ img{ max-width:100%; display:block; }
 .frame.f-c{ grid-column: 1 / 5; height: 260px; margin-top: 40px; }
 .frame.f-d{ grid-column: 5 / 13; height: 460px; margin-top: -60px; }
 
+/* les vraies photos gardent leurs proportions d'origine (pas de recadrage) —
+   seuls les placeholders (fond dégradé, sans photo) remplissent tout le cadre */
+.frame .shot-img{
+  object-fit: contain;
+  background: var(--bg-elevated);
+}
+
 @media (max-width: 760px){
   .series-head{ flex-direction:column; align-items:flex-start; gap:16px; }
   .series-cover{ width: 100%; height: 220px; }
