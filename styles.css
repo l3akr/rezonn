@@ -450,41 +450,58 @@ img{ max-width:100%; display:block; }
 .series-body{
   max-height:0;
   overflow:hidden;
-  transition: max-height 0.5s ease;
+  transition: max-height 0.6s ease;
 }
 .series-item.is-open .series-body{
-  max-height: 900px;
+  max-height: 6000px;
 }
 
-/* grille décalée portrait / paysage — signature */
+/* grille décalée portrait / paysage — signature.
+   Mise en page "masonry" : chaque photo garde son format d'origine
+   (portrait, paysage, carré...), les colonnes s'adaptent et créent
+   naturellement le décalage entre les tuiles. */
 .series-grid{
-  display:grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 3px;
+  column-count: 3;
+  column-gap: 3px;
   padding-top: 36px;
 }
 .frame{
   position: relative;
-  overflow:hidden;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  margin-bottom: 3px;
+  display: inline-block;
+  width: 100%;
 }
-/* variantes non-alignées : tailles + décalages verticaux volontaires */
-.frame.f-a{ grid-column: 1 / 6; height: 420px; margin-top: 0; }
-.frame.f-b{ grid-column: 6 / 13; height: 300px; margin-top: 90px; }
-.frame.f-c{ grid-column: 1 / 5; height: 260px; margin-top: 40px; }
-.frame.f-d{ grid-column: 5 / 13; height: 460px; margin-top: -60px; }
 
-/* les vraies photos gardent leurs proportions d'origine (pas de recadrage) —
-   seuls les placeholders (fond dégradé, sans photo) remplissent tout le cadre */
+/* placeholders : formats variés (portrait / paysage / carré) tant qu'aucune
+   vraie photo n'est présente, pour garder le rythme visuel */
+.frame .ph{
+  position: relative;
+  inset: auto;
+  aspect-ratio: 4 / 5;
+}
+.frame.f-a .ph{ aspect-ratio: 3 / 4; }
+.frame.f-b .ph{ aspect-ratio: 16 / 10; }
+.frame.f-c .ph{ aspect-ratio: 1 / 1; }
+.frame.f-d .ph{ aspect-ratio: 4 / 3; }
+
+/* vraies photos : affichées à leur format d'origine, jamais recadrées */
 .frame .shot-img{
-  object-fit: contain;
-  background: var(--bg-elevated);
+  position: static;
+  width: 100%;
+  height: auto;
+  object-fit: initial;
+  display: block;
 }
 
+@media (min-width: 1400px){
+  .series-grid{ column-count: 4; }
+}
 @media (max-width: 760px){
   .series-head{ flex-direction:column; align-items:flex-start; gap:16px; }
   .series-cover{ width: 100%; height: 220px; }
-  .series-grid{ display:flex; flex-direction:column; gap: 22px; padding-top: 28px; }
-  .frame{ margin-top:0 !important; height: 320px !important; }
+  .series-grid{ column-count: 1; padding-top: 28px; }
 }
 
 .flat-grid{
