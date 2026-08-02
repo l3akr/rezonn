@@ -370,7 +370,7 @@ img{ max-width:100%; display:block; }
 /* Réglage du cadrage par tuile — augmente le 2e pourcentage pour "descendre"
    la fenêtre visible dans la photo (montrer plus du bas du sujet). 0% = haut
    de la photo, 100% = bas de la photo. À ajuster tuile par tuile si besoin. */
-.cat-tile.c-faune{ --focus: center 75%; }
+.cat-tile.c-faune{ --focus: center 15%; }
 .frame-num{
   position:absolute; bottom:10px; left:12px;
   font-family: var(--font-mono);
