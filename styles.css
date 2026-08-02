@@ -370,7 +370,13 @@ img{ max-width:100%; display:block; }
 /* Réglage du cadrage par tuile — augmente le 2e pourcentage pour "descendre"
    la fenêtre visible dans la photo (montrer plus du bas du sujet). 0% = haut
    de la photo, 100% = bas de la photo. À ajuster tuile par tuile si besoin. */
-.cat-tile.c-faune{ --focus: center 15%; }
+.cat-tile.c-events{ --focus: center 50%; }
+.cat-tile.c-shooting{ --focus: center 30%; }
+.cat-tile.c-faune{ --focus: center 30%; }
+.cat-tile.c-prints{ --focus: center 50%; }
+.cat-tile.c-archives{ --focus: center 50%; }
+.cat-tile.c-contact{ --focus: center 50%; }
+
 .frame-num{
   position:absolute; bottom:10px; left:12px;
   font-family: var(--font-mono);
