@@ -48,6 +48,9 @@ const FALLBACK_PRINTS = [
 ];
 
 const FRAME_CLASSES = ['f-a', 'f-b', 'f-c', 'f-d'];
+/* formats par défaut des placeholders (largeur / hauteur), tant qu'aucune vraie
+   photo n'est présente — remplacés par le format réel dès qu'une photo charge */
+const RATIO_MAP = { 'f-a': 3 / 4, 'f-b': 16 / 10, 'f-c': 1, 'f-d': 4 / 3 };
 const FLAT_CATEGORIES = ['archives'];
 const INSTAGRAM_URL = 'https://www.instagram.com/re__zonn/';
 
@@ -190,6 +193,7 @@ function renderCategory(key) {
         <div class="series-grid flat-grid">${flatFramesHtml(cat)}</div>
       </div>
     `;
+    requestAnimationFrame(() => layoutMasonry(document.querySelector('.flat-grid')));
     return;
   }
 
@@ -207,7 +211,12 @@ function renderCategory(key) {
 
   document.querySelectorAll('.series-head').forEach(head => {
     head.addEventListener('click', () => {
-      head.closest('.series-item').classList.toggle('is-open');
+      const item = head.closest('.series-item');
+      const wasOpen = item.classList.contains('is-open');
+      item.classList.toggle('is-open');
+      if (!wasOpen) {
+        requestAnimationFrame(() => layoutMasonry(item.querySelector('.series-grid')));
+      }
     });
   });
 }
@@ -219,7 +228,7 @@ function flatFramesHtml(cat) {
     const cls = FRAME_CLASSES[idx % FRAME_CLASSES.length];
     const src = hasImages ? cat.images[idx] : null;
     const label = String(idx + 1).padStart(2, '0');
-    return `<div class="frame ${cls}">${media(src, cat.tone, label)}</div>`;
+    return `<div class="frame ${cls}" data-ratio="${RATIO_MAP[cls]}">${media(src, cat.tone, label)}</div>`;
   }).join('');
 }
 
@@ -232,7 +241,7 @@ function seriesItem(tone, series, i) {
   const framesHtml = Array.from({ length: count }).map((_, idx) => {
     const cls = hasImages ? FRAME_CLASSES[idx % FRAME_CLASSES.length] : series.frames[idx];
     const src = hasImages ? series.images[idx] : null;
-    return `<div class="frame ${cls}">${media(src, tone, num + '_' + (idx + 1))}</div>`;
+    return `<div class="frame ${cls}" data-ratio="${RATIO_MAP[cls]}">${media(src, tone, num + '_' + (idx + 1))}</div>`;
   }).join('');
 
   return `
@@ -301,6 +310,62 @@ function renderContact() {
     </div>
   `;
 }
+
+/* ============================================
+   Masonry — calcule la place exacte de chaque photo
+   (largeur selon l'orientation, hauteur selon le format réel)
+   ============================================ */
+function frameRatio(frame) {
+  const img = frame.querySelector('.shot-img');
+  if (img && img.naturalWidth && img.naturalHeight) {
+    return img.naturalWidth / img.naturalHeight;
+  }
+  return parseFloat(frame.dataset.ratio) || 1;
+}
+
+function placeFrame(frame, columnCount, rowGap, rowUnit) {
+  const ratio = frameRatio(frame);
+  const wide = ratio >= 1.15 && columnCount > 1;
+  const span = wide ? Math.min(2, columnCount) : 1;
+  frame.style.gridColumn = `span ${span}`;
+
+  const cellWidth = frame.getBoundingClientRect().width;
+  if (cellWidth > 0) {
+    const height = cellWidth / ratio;
+    const rowSpan = Math.max(1, Math.ceil((height + rowGap) / (rowUnit + rowGap)));
+    frame.style.gridRowEnd = `span ${rowSpan}`;
+  }
+}
+
+function layoutMasonry(container) {
+  if (!container) return;
+  const styles = getComputedStyle(container);
+  const columnCount = styles.gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+  const rowGap = parseFloat(styles.rowGap) || 0;
+  const rowUnit = parseFloat(styles.gridAutoRows) || 8;
+
+  container.querySelectorAll('.frame').forEach(frame => {
+    const img = frame.querySelector('.shot-img');
+    if (img && !img.complete) {
+      frame.style.gridColumn = 'span 1';
+      frame.style.gridRowEnd = 'span 40';
+      img.addEventListener('load', () => placeFrame(frame, columnCount, rowGap, rowUnit), { once: true });
+    } else {
+      placeFrame(frame, columnCount, rowGap, rowUnit);
+    }
+  });
+}
+
+let masonryResizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(masonryResizeTimer);
+  masonryResizeTimer = setTimeout(() => {
+    document.querySelectorAll('.series-grid').forEach(grid => {
+      const openItem = grid.closest('.series-item');
+      if (!openItem || openItem.classList.contains('is-open')) layoutMasonry(grid);
+    });
+  }, 150);
+});
 
 /* ============================================
    Routeur
