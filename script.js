@@ -4,13 +4,13 @@
    dans /photos pour une catégorie donnée.
    ============================================ */
 const FALLBACK_SERIES = {
-  club: {
-    label: 'CLUB', tone: 'club', meta: '4 SÉRIES — NOCTURNE',
+  events: {
+    label: 'ÉVÈNEMENTS', tone: 'events', meta: '4 SÉRIES — NOCTURNE',
     series: [
-      { title: 'NUIT BLANCHE', sub: 'CLUB — SÉRIE 01 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
-      { title: 'AFTER HOURS', sub: 'CLUB — SÉRIE 02 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
-      { title: 'BACKSTAGE', sub: 'CLUB — SÉRIE 03 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
-      { title: 'SOUS-SOL', sub: 'CLUB — SÉRIE 04 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
+      { title: 'NUIT BLANCHE', sub: 'ÉVÈNEMENTS — SÉRIE 01 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'AFTER HOURS', sub: 'ÉVÈNEMENTS — SÉRIE 02 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
+      { title: 'BACKSTAGE', sub: 'ÉVÈNEMENTS — SÉRIE 03 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'SOUS-SOL', sub: 'ÉVÈNEMENTS — SÉRIE 04 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
     ]
   },
   shooting: {
@@ -149,7 +149,7 @@ function renderHome() {
 
 function tilesHtml() {
   return [
-    catTile('club', 'CLUB', '01'),
+    catTile('events', 'ÉVÈNEMENTS', '01'),
     catTile('shooting', 'SHOOTING', '02'),
     catTile('faune', 'FAUNE', '03'),
     catTile('prints', 'PRINTS', '04'),
@@ -308,7 +308,7 @@ function renderContact() {
 const ROUTES = {
   '': renderHome,
   '/': renderHome,
-  '/club': () => renderCategory('club'),
+  '/events': () => renderCategory('events'),
   '/shooting': () => renderCategory('shooting'),
   '/faune': () => renderCategory('faune'),
   '/archives': () => renderCategory('archives'),
