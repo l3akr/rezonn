@@ -5,11 +5,17 @@
  * donc jamais besoin de le lancer à la main — il suffit de pousser des photos.
  *
  * Structure attendue :
- *   photos/club/nom-de-la-serie/01.jpg, 02.jpg, ...
+ *   photos/events/nom-de-la-serie/01.jpg, 02.jpg, ...
  *   photos/shooting/nom-de-la-serie/...
- *   photos/faune/nom-de-la-serie/...
- *   photos/archives/nom-de-la-serie/...
+ *   photos/performances/nom-de-la-serie/...
+ *   photos/animal/nom-de-la-serie/...
+ *   photos/archives/01.jpg, 02.jpg, ... (galerie plate, pas de sous-dossier)
  *   photos/prints/visuel.jpg (+ prints.json optionnel pour titre/format/prix)
+ *
+ * Ordre : un dossier de série (ou un fichier print) peut commencer par un
+ * numéro d'ordre — ex. "0 Toad & Akusis 2026" — pour contrôler son rang
+ * d'affichage. Ce numéro sert uniquement au tri : il est retiré du titre
+ * affiché sur le site.
  */
 
 const fs = require('fs');
@@ -20,11 +26,16 @@ const PHOTOS_DIR = path.join(ROOT, 'photos');
 const OUTPUT = path.join(ROOT, 'manifest.json');
 
 const IMAGE_EXT = /\.(jpe?g|png|webp)$/i;
-const SERIES_CATEGORIES = ['club', 'shooting', 'faune'];
+const SERIES_CATEGORIES = ['events', 'shooting', 'performances', 'animal'];
 const FLAT_CATEGORIES = ['archives'];
 
+/* retire un préfixe numérique d'ordre ("0 ", "01-", "12_"...) au début d'un nom */
+function stripOrderPrefix(name) {
+  return name.replace(/^\d+[\s\-_.]+/, '');
+}
+
 function titleize(name) {
-  return name.replace(/[-_]+/g, ' ').trim().toUpperCase();
+  return stripOrderPrefix(name).replace(/[-_]+/g, ' ').trim().toUpperCase();
 }
 
 function listImages(dir) {

@@ -22,12 +22,20 @@ const FALLBACK_SERIES = {
       { title: 'PORTRAITS', sub: 'SHOOTING — SÉRIE 04 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
     ]
   },
-  faune: {
-    label: 'FAUNE', tone: 'faune', meta: '3 SÉRIES — TERRAIN',
+  performances: {
+    label: 'PERFORMANCES', tone: 'performances', meta: '3 SÉRIES — SCÈNE',
     series: [
-      { title: 'RÉSERVE NATURELLE', sub: 'FAUNE — SÉRIE 01 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
-      { title: 'NOCTURNES', sub: 'FAUNE — SÉRIE 02 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
-      { title: 'LITTORAL', sub: 'FAUNE — SÉRIE 03 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'SCÈNE 01', sub: 'PERFORMANCES — SÉRIE 01 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'LIVE SESSION', sub: 'PERFORMANCES — SÉRIE 02 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
+      { title: 'RÉPÉTITION', sub: 'PERFORMANCES — SÉRIE 03 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
+    ]
+  },
+  animal: {
+    label: 'ANIMAL', tone: 'animal', meta: '3 SÉRIES — TERRAIN',
+    series: [
+      { title: 'RÉSERVE NATURELLE', sub: 'ANIMAL — SÉRIE 01 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'NOCTURNES', sub: 'ANIMAL — SÉRIE 02 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
+      { title: 'LITTORAL', sub: 'ANIMAL — SÉRIE 03 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
     ]
   }
 };
@@ -152,12 +160,13 @@ function renderHome() {
 
 function tilesHtml() {
   return [
-    catTile('events', 'ÉVÈNEMENTS', '01'),
-    catTile('shooting', 'SHOOTING', '02'),
-    catTile('faune', 'FAUNE', '03'),
-    catTile('prints', 'PRINTS', '04'),
-    catTile('archives', 'ARCHIVES', '05'),
-    catTile('contact', 'CONTACT', '06'),
+    catTile('events', 'ÉVÈNEMENTS', '0'),
+    catTile('shooting', 'SHOOTING', '1'),
+    catTile('performances', 'PERFORMANCES', '2'),
+    catTile('animal', 'ANIMAL', '3'),
+    catTile('prints', 'PRINTS', '4'),
+    catTile('archives', 'ARCHIVES', '5'),
+    catTile('contact', 'CONTACT', ''),
   ].join('');
 }
 
@@ -173,7 +182,6 @@ function catTile(key, label, index) {
   return `
     <a href="#/${key}" class="cat-tile c-${key}" data-nav>
       ${media(cover, key, index)}
-      <span class="cat-tile-index">${index}</span>
       <span class="cat-tile-label">${label}</span>
     </a>
   `;
@@ -375,7 +383,8 @@ const ROUTES = {
   '/': renderHome,
   '/events': () => renderCategory('events'),
   '/shooting': () => renderCategory('shooting'),
-  '/faune': () => renderCategory('faune'),
+  '/performances': () => renderCategory('performances'),
+  '/animal': () => renderCategory('animal'),
   '/archives': () => renderCategory('archives'),
   '/prints': renderPrints,
   '/contact': renderContact,
