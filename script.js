@@ -130,8 +130,8 @@ function esc(str) {
 function media(item, tone, frameLabel, kind) {
   if (item) {
     const o = typeof item === 'string' ? { src: item, thumb: item } : item;
-    const url = kind === 'thumb' ? (o.thumb || o.src) : o.src;
-    const dims = kind !== 'thumb' && o.w && o.h ? ` width="${o.w}" height="${o.h}"` : '';
+    const url = kind === 'thumb' ? (o.thumb || o.src) : kind === 'small' ? (o.small || o.thumb || o.src) : o.src;
+    const dims = !kind && o.w && o.h ? ` width="${o.w}" height="${o.h}"` : '';
     const label = frameLabel ? `<span class="frame-num">${esc(frameLabel)}</span>` : '';
     return `<img class="shot-img" src="${url}" alt=""${dims} loading="lazy" decoding="async">${label}`;
   }
@@ -277,7 +277,7 @@ function seriesItem(tone, series, i) {
   return `
     <div class="series-item">
       <div class="series-head">
-        <div class="series-cover">${media(cover, tone, '', 'thumb')}</div>
+        <div class="series-cover">${media(cover, tone, '', 'small')}</div>
         <div class="series-info">
           <h2 class="series-title">${esc(series.title)}</h2>
           ${(series.description || series.sub) ? `<p class="series-sub">${esc(series.description || series.sub)}</p>` : ''}

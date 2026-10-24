@@ -4,7 +4,7 @@
  *
  *  1. Copie les fichiers du site (index.html, styles.css, script.js, assets/).
  *  2. Optimise chaque photo de /photos : version plein écran (≤ 2000 px, WebP)
- *     + miniature (≤ 900 px, WebP) pour les couvertures et tuiles. Les originaux
+ *     + miniature HD (≤ 1600 px) pour les tuiles + petite vignette (≤ 800 px). Les originaux
  *     ne sont JAMAIS publiés — le site charge donc beaucoup plus vite.
  *  3. Génère dist/manifest.json (séries, titres, descriptions, dimensions).
  *
@@ -32,9 +32,11 @@ const SERIES_CATEGORIES = ['events', 'shooting', 'performances', 'animal'];
 const FLAT_CATEGORIES = ['archives'];
 
 const FULL_MAX = 2000;   // px, plus grand côté de la version plein écran
-const THUMB_MAX = 900;   // px, plus grand côté de la miniature
+const THUMB_MAX = 1600;  // px, tuiles du menu / accueil (grandes tuiles → haute définition)
+const SMALL_MAX = 800;   // px, couvertures de séries et tirages (petites vignettes)
 const FULL_QUALITY = 82;
-const THUMB_QUALITY = 74;
+const THUMB_QUALITY = 82;
+const SMALL_QUALITY = 76;
 
 /* ---------- utilitaires ---------- */
 
@@ -112,6 +114,7 @@ async function processImage(srcFile, relParts) {
 
   const fullName = `${base}.webp`;
   const thumbName = `${base}.t.webp`;
+  const smallName = `${base}.s.webp`;
 
   const pipeline = sharp(srcFile, { failOn: 'none' }).rotate(); // respecte l'orientation EXIF
   const full = await pipeline.clone()
@@ -124,9 +127,15 @@ async function processImage(srcFile, relParts) {
     .webp({ quality: THUMB_QUALITY })
     .toFile(path.join(outDir, thumbName));
 
+  await pipeline.clone()
+    .resize({ width: SMALL_MAX, height: SMALL_MAX, fit: 'inside', withoutEnlargement: true })
+    .webp({ quality: SMALL_QUALITY })
+    .toFile(path.join(outDir, smallName));
+
   return {
     src: enc(['photos', ...dirParts]) + '/' + encodeURIComponent(fullName),
     thumb: enc(['photos', ...dirParts]) + '/' + encodeURIComponent(thumbName),
+    small: enc(['photos', ...dirParts]) + '/' + encodeURIComponent(smallName),
     w: full.width,
     h: full.height
   };
@@ -178,7 +187,7 @@ async function buildPrints() {
       title: info.title || titleize(f.replace(IMAGE_EXT, '')),
       format: info.format || '—',
       price: info.price || '—',
-      image: imgs[i].thumb,
+      image: imgs[i].small,
       full: imgs[i].src
     };
   });
