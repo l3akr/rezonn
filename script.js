@@ -7,35 +7,35 @@ const FALLBACK_SERIES = {
   events: {
     label: 'ÉVÈNEMENTS', tone: 'events', meta: '4 SÉRIES — NOCTURNE',
     series: [
-      { title: 'NUIT BLANCHE', sub: 'ÉVÈNEMENTS — SÉRIE 01 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
-      { title: 'AFTER HOURS', sub: 'ÉVÈNEMENTS — SÉRIE 02 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
-      { title: 'BACKSTAGE', sub: 'ÉVÈNEMENTS — SÉRIE 03 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
-      { title: 'SOUS-SOL', sub: 'ÉVÈNEMENTS — SÉRIE 04 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
+      { title: 'NUIT BLANCHE', sub: 'Description de la série', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'AFTER HOURS', sub: 'Description de la série', frames: ['f-a','f-b','f-c'] },
+      { title: 'BACKSTAGE', sub: 'Description de la série', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'SOUS-SOL', sub: 'Description de la série', frames: ['f-a','f-b','f-c'] },
     ]
   },
   shooting: {
     label: 'SHOOTING', tone: 'shooting', meta: '4 SÉRIES — STUDIO & EXTÉRIEUR',
     series: [
-      { title: 'STUDIO 01', sub: 'SHOOTING — SÉRIE 01 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
-      { title: 'LOOKBOOK SS26', sub: 'SHOOTING — SÉRIE 02 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
-      { title: 'LUMIÈRE NATURELLE', sub: 'SHOOTING — SÉRIE 03 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
-      { title: 'PORTRAITS', sub: 'SHOOTING — SÉRIE 04 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
+      { title: 'STUDIO 01', sub: 'Description de la série', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'LOOKBOOK SS26', sub: 'Description de la série', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'LUMIÈRE NATURELLE', sub: 'Description de la série', frames: ['f-a','f-b','f-c'] },
+      { title: 'PORTRAITS', sub: 'Description de la série', frames: ['f-a','f-b','f-c'] },
     ]
   },
   performances: {
     label: 'PERFORMANCES', tone: 'performances', meta: '3 SÉRIES — SCÈNE',
     series: [
-      { title: 'SCÈNE 01', sub: 'PERFORMANCES — SÉRIE 01 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
-      { title: 'LIVE SESSION', sub: 'PERFORMANCES — SÉRIE 02 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
-      { title: 'RÉPÉTITION', sub: 'PERFORMANCES — SÉRIE 03 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
+      { title: 'SCÈNE 01', sub: 'Description de la série', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'LIVE SESSION', sub: 'Description de la série', frames: ['f-a','f-b','f-c'] },
+      { title: 'RÉPÉTITION', sub: 'Description de la série', frames: ['f-a','f-b','f-c'] },
     ]
   },
   animal: {
     label: 'ANIMAL', tone: 'animal', meta: '3 SÉRIES — TERRAIN',
     series: [
-      { title: 'RÉSERVE NATURELLE', sub: 'ANIMAL — SÉRIE 01 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
-      { title: 'NOCTURNES', sub: 'ANIMAL — SÉRIE 02 — 3 PLANCHES', frames: ['f-a','f-b','f-c'] },
-      { title: 'LITTORAL', sub: 'ANIMAL — SÉRIE 03 — 4 PLANCHES', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'RÉSERVE NATURELLE', sub: 'Description de la série', frames: ['f-a','f-b','f-c','f-d'] },
+      { title: 'NOCTURNES', sub: 'Description de la série', frames: ['f-a','f-b','f-c'] },
+      { title: 'LITTORAL', sub: 'Description de la série', frames: ['f-a','f-b','f-c','f-d'] },
     ]
   }
 };
@@ -120,12 +120,27 @@ function mergeData(manifest) {
    Rendu d'un visuel : vraie photo si disponible,
    sinon bloc placeholder (grain + dégradé par catégorie).
    ============================================ */
-function media(src, tone, frameLabel) {
-  if (src) {
-    return `<img class="shot-img" src="${src}" alt="" loading="lazy">
-            <span class="frame-num">${frameLabel}</span>`;
+function esc(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* item : null (placeholder) | chaîne (URL) | {src, thumb, w, h}
+   kind : 'thumb' pour couvertures/tuiles (petit fichier), sinon plein écran */
+function media(item, tone, frameLabel, kind) {
+  if (item) {
+    const o = typeof item === 'string' ? { src: item, thumb: item } : item;
+    const url = kind === 'thumb' ? (o.thumb || o.src) : o.src;
+    const dims = kind !== 'thumb' && o.w && o.h ? ` width="${o.w}" height="${o.h}"` : '';
+    const label = frameLabel ? `<span class="frame-num">${esc(frameLabel)}</span>` : '';
+    return `<img class="shot-img" src="${url}" alt=""${dims} loading="lazy" decoding="async">${label}`;
   }
-  return `<div class="ph tone-${tone}" data-frame="${frameLabel}"></div>`;
+  return `<div class="ph tone-${tone}" data-frame="${esc(frameLabel || '')}"></div>`;
+}
+
+function ratioOf(item, cls) {
+  if (item && item.w && item.h) return item.w / item.h;
+  return RATIO_MAP[cls];
 }
 
 /* ============================================
@@ -142,8 +157,7 @@ function categoryCover(key) {
 function renderHome() {
   app.innerHTML = `
     <section class="hero">
-      <h1 class="hero-word">REZONN</h1>
-      <p class="hero-note">Typo à venir</p>
+      <h1 class="hero-word"><img class="hero-logo" src="assets/logo.png" alt="REZONN" onerror="this.outerHTML='REZONN'"></h1>
       <p class="hero-tagline">Photographie — Séries — Tirages</p>
       <button class="hero-scroll" id="heroScroll">DÉFILER</button>
     </section>
@@ -181,7 +195,7 @@ function catTile(key, label, index) {
 
   return `
     <a href="#/${key}" class="cat-tile c-${key}" data-nav>
-      ${media(cover, key, index)}
+      ${media(cover, key, index, 'thumb')}
       <span class="cat-tile-label">${label}</span>
     </a>
   `;
@@ -234,9 +248,9 @@ function flatFramesHtml(cat) {
   const count = hasImages ? cat.images.length : cat.count;
   return Array.from({ length: count }).map((_, idx) => {
     const cls = FRAME_CLASSES[idx % FRAME_CLASSES.length];
-    const src = hasImages ? cat.images[idx] : null;
-    const label = String(idx + 1).padStart(2, '0');
-    return `<div class="frame ${cls}" data-ratio="${RATIO_MAP[cls]}">${media(src, cat.tone, label)}</div>`;
+    const item = hasImages ? cat.images[idx] : null;
+    const label = hasImages ? '' : String(idx + 1).padStart(2, '0');
+    return `<div class="frame ${cls}" data-ratio="${ratioOf(item, cls)}">${media(item, cat.tone, label)}</div>`;
   }).join('');
 }
 
@@ -248,17 +262,18 @@ function seriesItem(tone, series, i) {
 
   const framesHtml = Array.from({ length: count }).map((_, idx) => {
     const cls = hasImages ? FRAME_CLASSES[idx % FRAME_CLASSES.length] : series.frames[idx];
-    const src = hasImages ? series.images[idx] : null;
-    return `<div class="frame ${cls}" data-ratio="${RATIO_MAP[cls]}">${media(src, tone, num + '_' + (idx + 1))}</div>`;
+    const item = hasImages ? series.images[idx] : null;
+    const label = hasImages ? '' : num + '_' + (idx + 1);
+    return `<div class="frame ${cls}" data-ratio="${ratioOf(item, cls)}">${media(item, tone, label)}</div>`;
   }).join('');
 
   return `
     <div class="series-item">
       <div class="series-head">
-        <div class="series-cover">${media(cover, tone, 'COVER — ' + num)}</div>
+        <div class="series-cover">${media(cover, tone, '', 'thumb')}</div>
         <div class="series-info">
-          <h2 class="series-title">${series.title}</h2>
-          <p class="series-sub">${series.sub || (series.title + ' — ' + count + ' PLANCHES')}</p>
+          <h2 class="series-title">${esc(series.title)}</h2>
+          <p class="series-sub">${count} PHOTO${count > 1 ? 'S' : ''}</p>
         </div>
         <span class="series-toggle">+</span>
       </div>
@@ -296,7 +311,7 @@ function printCard(p, i) {
   const name = p.name || p.title;
   return `
     <div class="print-card">
-      <div class="print-visual">${media(p.image, 'prints', num)}</div>
+      <div class="print-visual">${media(p.image, 'prints', num, 'thumb')}</div>
       <div class="print-info">
         <div>
           <div class="print-name">${name}</div>
@@ -324,11 +339,11 @@ function renderContact() {
    (largeur selon l'orientation, hauteur selon le format réel)
    ============================================ */
 function frameRatio(frame) {
+  const r = parseFloat(frame.dataset.ratio);
+  if (r) return r;
   const img = frame.querySelector('.shot-img');
-  if (img && img.naturalWidth && img.naturalHeight) {
-    return img.naturalWidth / img.naturalHeight;
-  }
-  return parseFloat(frame.dataset.ratio) || 1;
+  if (img && img.naturalWidth && img.naturalHeight) return img.naturalWidth / img.naturalHeight;
+  return 1;
 }
 
 function placeFrame(frame, columnCount, rowGap, rowUnit) {
@@ -351,17 +366,7 @@ function layoutMasonry(container) {
   const columnCount = styles.gridTemplateColumns.split(' ').filter(Boolean).length || 1;
   const rowGap = parseFloat(styles.rowGap) || 0;
   const rowUnit = parseFloat(styles.gridAutoRows) || 8;
-
-  container.querySelectorAll('.frame').forEach(frame => {
-    const img = frame.querySelector('.shot-img');
-    if (img && !img.complete) {
-      frame.style.gridColumn = 'span 1';
-      frame.style.gridRowEnd = 'span 40';
-      img.addEventListener('load', () => placeFrame(frame, columnCount, rowGap, rowUnit), { once: true });
-    } else {
-      placeFrame(frame, columnCount, rowGap, rowUnit);
-    }
-  });
+  container.querySelectorAll('.frame').forEach(frame => placeFrame(frame, columnCount, rowGap, rowUnit));
 }
 
 let masonryResizeTimer;
@@ -449,7 +454,7 @@ function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 window.addEventListener('hashchange', router);
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const [manifest] = await Promise.all([loadManifest(), wait(900)]);
+  const [manifest] = await Promise.all([loadManifest(), wait(350)]);
   mergeData(manifest);
   renderMenuGrid();
   router();

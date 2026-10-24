@@ -4,16 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>REZONN — Photographie</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/favicon.png">
+<meta name="theme-color" content="#17181a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;800&family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Inter:wght@300&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
   <!-- ÉCRAN DE CHARGEMENT (placeholder — sera remplacé par l'identité typo définitive) -->
   <div id="loader" class="loader" aria-hidden="true">
-    <span class="loader-word">REZONN</span>
+    <img class="loader-logo" src="assets/logo.png" alt="REZONN" onerror="this.outerHTML='<span class=&quot;loader-word&quot;>REZONN</span>'">
     <div class="loader-bar"><div class="loader-bar-fill"></div></div>
   </div>
 
@@ -21,7 +24,7 @@
   <div class="grain" aria-hidden="true"></div>
 
   <header class="site-header">
-    <a href="#/" class="wordmark" id="headerWordmark" data-nav>REZONN<span class="wordmark-note">TYPO — À VENIR</span></a>
+    <a href="#/" class="wordmark" id="headerWordmark" data-nav><img class="logo" src="assets/logo.png" alt="REZONN" onerror="this.outerHTML='REZONN'"></a>
 
     <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="menuOverlay">
       <span class="menu-toggle-label">MENU</span>

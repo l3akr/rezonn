@@ -1,109 +1,85 @@
 # REZONN — site vitrine
 
-Site statique (HTML/CSS/JS, sans build) avec mise à jour automatique des photos
-via GitHub Actions.
+Site statique (HTML/CSS/JS). À chaque `push` sur `main`, GitHub Actions optimise
+les photos (WebP + miniatures), génère le site dans `dist/` et le publie sur
+GitHub Pages. Les originaux ne sont jamais publiés → le site charge vite.
 
 ## Mise en ligne (une seule fois)
 
-1. Crée un dépôt GitHub et pousse tout ce dossier dedans (branche `main`).
-2. Dans le dépôt : **Settings → Pages → Build and deployment → Source : "GitHub Actions"**.
-3. Pousse un commit (ou relance le workflow manuellement dans l'onglet **Actions**) :
-   le site se déploie automatiquement à l'URL `https://<utilisateur>.github.io/<depot>/`.
+1. Pousse tout ce dossier sur ton dépôt GitHub (branche `main`).
+2. **Settings → Pages → Build and deployment → Source : "GitHub Actions"**.
+3. Le workflow `.github/workflows/deploy.yml` se lance tout seul à chaque push.
 
-Chaque `push` sur `main` régénère `manifest.json` à partir du contenu de `/photos`
-et redéploie le site — aucune action manuelle supplémentaire n'est nécessaire.
+## Logo et icône
+
+Dépose tes deux fichiers dans `assets/` :
+
+```
+assets/logo.png       ← RESONN.PNG   (header, écran de chargement, accueil)
+assets/favicon.png    ← REZONNICON.PNG (icône d'onglet)
+```
+
+Tant que `logo.png` est absent, le site affiche le texte "REZONN" à la place.
 
 ## Ajouter des photos
 
-### ÉVÈNEMENTS / SHOOTING / PERFORMANCES / ANIMAL
+### ÉVÈNEMENTS / SHOOTING / PERFORMANCES / ANIMAL — séries
 
-Chaque sous-dossier de série devient une entrée sur le site. Le nom du dossier
-devient le titre affiché (tirets/underscores → espaces, en majuscules).
+Un sous-dossier = une série. Son nom devient le titre affiché (en majuscules).
 
-Pour contrôler l'**ordre d'affichage**, fais commencer le nom du dossier par un
-numéro suivi d'un espace, d'un tiret ou d'un underscore (ex. `0 Toad & Akusis
-2026`, `01-nuit-blanche`). Ce numéro ne sert qu'au tri : il n'apparaît jamais
-sur le site, et le reste du nom (espaces, esperluettes, accents...) s'affiche
-tel quel.
+**Ordre** : commence le nom du dossier par un numéro suivi d'un espace
+(`12 Toad & Akusis 2026`). **Plus le numéro est grand, plus la série est
+récente → elle s'affiche en premier.** Le numéro n'apparaît jamais sur le site.
+
+**Nombre de photos** : calculé automatiquement et affiché sous le titre (ex. « 3 PHOTOS »).
 
 ```
 photos/
   events/
-    0 Toad & Akusis 2026/
+    12 Toad & Akusis 2026/
       01.jpg
       02.jpg
-      03.jpg
-    1 After Hours/
+    3 After Hours/
       01.jpg
-      02.jpg
-  shooting/
-    0 Studio/
-      01.jpg
-      ...
-  performances/
-    ...
-  animal/
-    ...
+  shooting/ ...
+  performances/ ...
+  animal/ ...
 ```
 
-- Formats acceptés : `.jpg`, `.jpeg`, `.png`, `.webp`.
-- Les images à l'intérieur d'une série sont triées par ordre alphabétique/numérique
-  (`01.jpg` avant `02.jpg`).
-- La première image du dossier sert de couverture (vignette de la série).
-- Une série sans image n'apparaît pas — le placeholder reste affiché tant que le
-  dossier est vide.
+- Formats : `.jpg`, `.jpeg`, `.png`, `.webp`, `.heic`.
+- Dans une série, les photos sont triées par nom (`01.jpg` avant `02.jpg`) ;
+  la première sert de couverture.
+- Les photos gardent leur format d'origine (portrait / paysage), sans recadrage.
 
-### ARCHIVES — pas de séries, galerie plate
+### ARCHIVES — galerie plate
 
-Ici, pas de sous-dossier : les photos vont **directement à la racine** de
-`photos/archives/`. Elles s'affichent toutes ensemble dans la grille décalée,
-sans clic préalable ni regroupement par série.
-
-```
-photos/archives/
-  01.jpg
-  02.jpg
-  03.jpg
-  ...
-```
+Photos directement dans `photos/archives/` (pas de sous-dossier).
 
 ### PRINTS
 
-Les images se placent directement dans `photos/prints/` (pas de sous-dossier) :
-
-```
-photos/prints/
-  nuit-blanche-04.jpg
-  reserve-02.jpg
-  prints.json   (optionnel)
-```
-
-Sans `prints.json`, le titre est déduit du nom de fichier, et le format/prix
-affichent `—`. Pour préciser ces informations, complète `prints.json` :
+Images directement dans `photos/prints/`, plus un `prints.json` optionnel :
 
 ```json
 {
-  "nuit-blanche-04.jpg": { "title": "NUIT BLANCHE — 04", "format": "30×40 cm — éd. 25", "price": "180 €" },
-  "reserve-02.jpg": { "title": "RÉSERVE — 02", "format": "40×60 cm — éd. 15", "price": "260 €" }
+  "nuit-blanche-04.jpg": { "title": "NUIT BLANCHE — 04", "format": "30×40 cm — éd. 25", "price": "180 €" }
 }
 ```
 
-(la clé est le nom du fichier tel qu'il apparaît dans le dossier `photos/prints/`)
-
-## Structure du projet
+## Tester en local
 
 ```
-index.html               page + squelette (header, footer, #app)
-styles.css                design (fond anthracite, grilles décalées, grain)
-script.js                 routeur + fusion des données réelles/placeholder
-scripts/generate-manifest.js   génère manifest.json à partir de /photos
-.github/workflows/deploy.yml   build + déploiement GitHub Pages automatique
-photos/                   tes photos, organisées par catégorie
+npm install
+node scripts/build.js      # génère dist/
+cd dist && python3 -m http.server 8000
 ```
 
-## Typo de marque
+## Structure
 
-Le wordmark REZONN utilise pour l'instant Big Shoulders Display en placeholder
-(mention "TYPO — À VENIR" sous le logo). Une fois la typo définitive prête,
-remplace la référence dans `styles.css` (`--font-display`) et retire la mention
-`.wordmark-note` dans `index.html`.
+```
+index.html, styles.css, script.js   le site
+assets/                             logo.png, favicon.png
+photos/                             tes photos (originaux)
+scripts/build.js                    optimisation + manifest.json → dist/
+package.json                        dépendance : sharp
+.github/workflows/deploy.yml        build + déploiement GitHub Pages
+```

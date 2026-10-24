@@ -1,0 +1,7 @@
+{
+  "name": "rezonn",
+  "private": true,
+  "description": "Site vitrine REZONN — build des photos optimisées",
+  "scripts": { "build": "node scripts/build.js" },
+  "dependencies": { "sharp": "^0.34.0" }
+}
