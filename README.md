@@ -31,12 +31,15 @@ Un sous-dossier = une série. Son nom devient le titre affiché (en majuscules).
 (`12 Toad & Akusis 2026`). **Plus le numéro est grand, plus la série est
 récente → elle s'affiche en premier.** Le numéro n'apparaît jamais sur le site.
 
-**Nombre de photos** : calculé automatiquement et affiché sous le titre (ex. « 3 PHOTOS »).
+**Description** (optionnelle) : ajoute-la dans le nom du dossier après un tiret
+entouré d'espaces : `12 flashday tattoo - le confidentiel` → titre
+« FLASHDAY TATTOO », description « le confidentiel ». Un tiret sans espaces
+(`after-hours`) reste dans le titre.
 
 ```
 photos/
   events/
-    12 Toad & Akusis 2026/
+    12 Toad & Akusis 2026 - Soirée au Bikini/
       01.jpg
       02.jpg
     3 After Hours/

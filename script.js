@@ -93,7 +93,7 @@ function mergeData(manifest) {
       label: fb.label,
       tone: fb.tone,
       meta: real.length ? `${real.length} SÉRIE${real.length > 1 ? 'S' : ''}` : fb.meta,
-      series: real.length ? real : fb.series
+      series: real.length ? real.slice().sort((a, b) => (b.order ?? -1) - (a.order ?? -1)) : fb.series
     };
   });
 
@@ -185,7 +185,14 @@ function tilesHtml() {
 }
 
 function renderMenuGrid() {
-  document.getElementById('menuGrid').innerHTML = tilesHtml();
+  const grid = document.getElementById('menuGrid');
+  grid.innerHTML = tilesHtml();
+  /* les images du menu sont chargées et décodées dès le départ (pendant l'écran
+     de chargement) pour apparaître instantanément au survol */
+  grid.querySelectorAll('img.shot-img').forEach(img => {
+    img.loading = 'eager';
+    if (img.decode) img.decode().catch(() => {});
+  });
 }
 
 function catTile(key, label, index) {
@@ -273,7 +280,7 @@ function seriesItem(tone, series, i) {
         <div class="series-cover">${media(cover, tone, '', 'thumb')}</div>
         <div class="series-info">
           <h2 class="series-title">${esc(series.title)}</h2>
-          <p class="series-sub">${count} PHOTO${count > 1 ? 'S' : ''}</p>
+          ${(series.description || series.sub) ? `<p class="series-sub">${esc(series.description || series.sub)}</p>` : ''}
         </div>
         <span class="series-toggle">+</span>
       </div>

@@ -24,8 +24,16 @@ jobs:
       - name: Récupérer le code
         uses: actions/checkout@v4
 
-      - name: Générer le manifest à partir de /photos
-        run: node scripts/generate-manifest.js
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installer les dépendances (sharp)
+        run: npm install --no-audit --no-fund
+
+      - name: Optimiser les photos et générer le site (dist/)
+        run: node scripts/build.js
 
       - name: Préparer GitHub Pages
         uses: actions/configure-pages@v5
@@ -33,7 +41,7 @@ jobs:
       - name: Créer l'artefact du site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: dist
 
       - name: Déployer
         id: deployment

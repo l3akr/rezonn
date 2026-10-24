@@ -11,6 +11,8 @@
  * Structure attendue :
  *   photos/events|shooting|performances|animal/<série>/01.jpg, 02.jpg, ...
  *       <série> peut commencer par un numéro d'ordre : "12 Toad & Akusis 2026".
+ *       Description après un tiret entouré d'espaces :
+ *       "12 flashday tattoo - le confidentiel".
  *       Le numéro sert uniquement au tri (plus grand = plus récent = affiché
  *       en premier) et n'apparaît jamais sur le site.
  *   photos/archives/01.jpg, 02.jpg, ...        (galerie plate)
@@ -37,12 +39,22 @@ const THUMB_QUALITY = 74;
 /* ---------- utilitaires ---------- */
 
 function stripOrderPrefix(name) {
-  return name.replace(/^\d+[\s\-_.]+/, '');
+  return name.replace(/^\s*\d+[\s\-_.]*/, '');
 }
 
 function orderOf(name) {
-  const m = name.match(/^(\d+)[\s\-_.]/);
+  const m = name.match(/^\s*(\d+)/);
   return m ? parseInt(m[1], 10) : -1;
+}
+
+/* "12 flashday tattoo - le confidentiel" → titre "FLASHDAY TATTOO",
+   description "le confidentiel" (séparateur : tiret entouré d'espaces) */
+function parseFolderName(name) {
+  const parts = stripOrderPrefix(name).split(/\s+[-–—]\s+/);
+  return {
+    title: parts[0].replace(/[-_]+/g, ' ').trim().toUpperCase(),
+    description: parts.slice(1).join(' — ').trim()
+  };
 }
 
 function titleize(name) {
@@ -136,7 +148,8 @@ async function buildSeriesCategory(key) {
     const images = await runPool(files.map(f => () =>
       processImage(path.join(dir, folder, f), [key, folder, f])));
 
-    series.push({ title: titleize(folder), images });
+    const { title, description } = parseFolderName(folder);
+    series.push({ title, description, order: orderOf(folder), images });
   }
   return series;
 }

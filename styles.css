@@ -48,8 +48,8 @@ img{ max-width:100%; display:block; }
   position: fixed; inset:0;
   pointer-events:none;
   z-index: 9998;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
+  opacity: 0.035;
+  transform: translateZ(0);
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
@@ -62,7 +62,7 @@ img{ max-width:100%; display:block; }
   background: var(--bg);
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap: 24px;
-  transition: opacity 0.6s ease, visibility 0.6s ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 .loader.is-hidden{
   opacity: 0;
@@ -107,8 +107,9 @@ img{ max-width:100%; display:block; }
   padding: 0 28px;
   z-index: 900;
   background: rgba(23,24,26,0.4);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transform: translateZ(0);
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .wordmark{
@@ -150,8 +151,9 @@ img{ max-width:100%; display:block; }
   background: var(--bg);
   visibility: hidden;
   opacity: 0;
-  transition: opacity 0.4s ease, visibility 0.4s ease;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
   overflow: hidden;
+  will-change: opacity;
 }
 .menu-overlay.is-open{
   visibility: visible;
@@ -173,7 +175,9 @@ img{ max-width:100%; display:block; }
 #menuGrid .cat-tile .ph,
 #menuGrid .cat-tile .shot-img{
   opacity: 0;
-  transition: opacity 0.4s ease, transform 0.6s ease;
+  transition: opacity 0.15s ease-out;
+  will-change: opacity;
+  transform: translateZ(0);
 }
 #menuGrid .cat-tile:hover .ph,
 #menuGrid .cat-tile:hover .shot-img{
@@ -186,7 +190,7 @@ img{ max-width:100%; display:block; }
   background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0) 60%);
   z-index:1;
   opacity:0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.15s ease-out;
 }
 #menuGrid .cat-tile:hover::after{ opacity: 1; }
 
@@ -286,6 +290,7 @@ img{ max-width:100%; display:block; }
 .cat-tile{
   position: relative;
   overflow:hidden;
+  contain: layout paint;
   display:flex; align-items:flex-end;
   padding: 20px;
   cursor:pointer;
@@ -297,7 +302,7 @@ img{ max-width:100%; display:block; }
   letter-spacing: 0.04em;
   color: var(--fg);
   z-index:2;
-  transition: color 0.3s ease, transform 0.3s ease;
+  transition: color 0.12s ease, transform 0.15s ease;
   min-width: 0;
   max-width: 100%;
   overflow-wrap: break-word;
@@ -337,7 +342,7 @@ img{ max-width:100%; display:block; }
 .ph::before{
   content:'';
   position:absolute; inset:0;
-  transition: transform 0.6s ease;
+  transition: transform 0.35s ease-out;
   background-image:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/></svg>"),
     linear-gradient(155deg, var(--g1), var(--g2) 55%, var(--g3));
