@@ -379,8 +379,8 @@ img{ max-width:100%; display:block; }
 /* Réglage du cadrage par tuile — augmente le 2e pourcentage pour "descendre"
    la fenêtre visible dans la photo (montrer plus du bas du sujet). 0% = haut
    de la photo, 100% = bas de la photo. À ajuster tuile par tuile si besoin. */
-.cat-tile.c-events{ --focus: center 20%; }
-.cat-tile.c-shooting{ --focus: center 25%; }
+.cat-tile.c-events{ --focus: center 25%; }
+.cat-tile.c-shooting{ --focus: center 29%; }
 .cat-tile.c-performances{ --focus: center 50%; }
 .cat-tile.c-animal{ --focus: center 30%; }
 .cat-tile.c-prints{ --focus: center 50%; }
