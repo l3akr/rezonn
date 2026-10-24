@@ -384,7 +384,7 @@ img{ max-width:100%; display:block; }
 .cat-tile.c-performances{ --focus: center 50%; }
 .cat-tile.c-animal{ --focus: center 30%; }
 .cat-tile.c-prints{ --focus: center 50%; }
-.cat-tile.c-archives{ --focus: center 50%; }
+.cat-tile.c-archives{ --focus: center 20%; }
 .cat-tile.c-contact{ --focus: center 50%; }
 .frame-num{
   position:absolute; bottom:10px; left:12px;
