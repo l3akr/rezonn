@@ -403,13 +403,13 @@ img{ max-width:100%; display:block; }
 /* Réglage du cadrage par tuile — augmente le 2e pourcentage pour "descendre"
    la fenêtre visible dans la photo (montrer plus du bas du sujet). 0% = haut
    de la photo, 100% = bas de la photo. À ajuster tuile par tuile si besoin. */
-   .cat-tile.c-events{ --focus: center 29%; }
-   .cat-tile.c-shooting{ --focus: center 22%; }
-   .cat-tile.c-performances{ --focus: center 50%; }
-   .cat-tile.c-animal{ --focus: center 30%; }
-   .cat-tile.c-prints{ --focus: center 50%; }
-   .cat-tile.c-archives{ --focus: center 24%; }
-   .cat-tile.c-contact{ --focus: center 50%; }
+.cat-tile.c-events{ --focus: center 29%; }
+.cat-tile.c-shooting{ --focus: center 22%; }
+.cat-tile.c-performances{ --focus: center 50%; }
+.cat-tile.c-animal{ --focus: center 30%; }
+.cat-tile.c-prints{ --focus: center 50%; }
+.cat-tile.c-archives{ --focus: center 24%; }
+.cat-tile.c-contact{ --focus: center 50%; }
 .frame-num{
   position:absolute; bottom:10px; left:12px;
   font-family: var(--font-mono);
@@ -533,6 +533,21 @@ img{ max-width:100%; display:block; }
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* logo discret, centré en bas de chaque photo (séries, archives, tirages).
+   Pas sur les tuiles du menu/accueil ni sur les couvertures de séries. */
+.frame::after,
+.print-visual::after{
+  content:'';
+  position:absolute;
+  left:0; right:0; bottom: clamp(8px, 1.4vw, 18px);
+  height: clamp(14px, 1.8vw, 26px);
+  background: url('assets/logo.png') center bottom / contain no-repeat;
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.55));
+  pointer-events: none;
+  z-index: 3;
 }
 
 @media (min-width: 1400px){
@@ -661,3 +676,7 @@ img{ max-width:100%; display:block; }
   color: var(--fg-faint);
 }
 .site-footer-insta:hover{ color: var(--accent); }
+
+/* SEO */
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.seo-text{max-width:720px;margin:0 auto;padding:40px 20px 0;text-align:center;color:var(--fg-faint);font-family:'Inter',sans-serif;font-weight:300;font-size:13px;line-height:1.7}

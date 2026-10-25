@@ -135,7 +135,7 @@ function media(item, tone, frameLabel, kind) {
     const url = kind === 'thumb' ? (o.thumb || o.src) : kind === 'small' ? (o.small || o.thumb || o.src) : o.src;
     const dims = !kind && o.w && o.h ? ` width="${o.w}" height="${o.h}"` : '';
     const label = frameLabel ? `<span class="frame-num">${esc(frameLabel)}</span>` : '';
-    return `<img class="shot-img" src="${url}" alt=""${dims} loading="lazy" decoding="async">${label}`;
+    return `<img class="shot-img" src="${url}" alt="REZONN photographe — photo"${dims} loading="lazy" decoding="async">${label}`;
   }
   return `<div class="ph tone-${tone}" data-frame="${esc(frameLabel || '')}"></div>`;
 }

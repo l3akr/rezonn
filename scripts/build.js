@@ -141,6 +141,17 @@ async function processImage(srcFile, relParts) {
   };
 }
 
+/* version tolérante : une photo illisible est signalée puis ignorée,
+   elle ne bloque plus le déploiement du reste du site */
+async function safeProcess(srcFile, relParts) {
+  try {
+    return await processImage(srcFile, relParts);
+  } catch (err) {
+    console.warn(`⚠️  Photo ignorée (illisible) : ${relParts.join('/')} — ${err.message}`);
+    return null;
+  }
+}
+
 /* ---------- catégories ---------- */
 
 async function buildSeriesCategory(key) {
@@ -154,8 +165,9 @@ async function buildSeriesCategory(key) {
     const files = listImages(path.join(dir, folder));
     if (!files.length) continue;
 
-    const images = await runPool(files.map(f => () =>
-      processImage(path.join(dir, folder, f), [key, folder, f])));
+    const images = (await runPool(files.map(f => () =>
+      safeProcess(path.join(dir, folder, f), [key, folder, f])))).filter(Boolean);
+    if (!images.length) continue;
 
     const { title, description } = parseFolderName(folder);
     series.push({ title, description, order: orderOf(folder), images });
@@ -166,7 +178,7 @@ async function buildSeriesCategory(key) {
 async function buildFlatCategory(key) {
   const dir = path.join(PHOTOS_DIR, key);
   const files = listImages(dir);
-  return runPool(files.map(f => () => processImage(path.join(dir, f), [key, f])));
+  return (await runPool(files.map(f => () => safeProcess(path.join(dir, f), [key, f])))).filter(Boolean);
 }
 
 async function buildPrints() {
@@ -180,15 +192,15 @@ async function buildPrints() {
     catch (e) { console.warn('⚠️  prints.json invalide, ignoré :', e.message); }
   }
 
-  const imgs = await runPool(files.map(f => () => processImage(path.join(dir, f), ['prints', f])));
-  return files.map((f, i) => {
+  const imgs = await runPool(files.map(f => () => safeProcess(path.join(dir, f), ['prints', f])));
+  return files.map((f, i) => ({ f, img: imgs[i] })).filter(x => x.img).map(({ f, img }) => {
     const info = meta[f] || {};
     return {
       title: info.title || titleize(f.replace(IMAGE_EXT, '')),
       format: info.format || '—',
       price: info.price || '—',
-      image: imgs[i].small,
-      full: imgs[i].src
+      image: img.small,
+      full: img.src
     };
   });
 }
@@ -199,7 +211,26 @@ async function buildPrints() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST, { recursive: true });
 
-  ['index.html', 'styles.css', 'script.js'].forEach(f => fs.copyFileSync(path.join(ROOT, f), path.join(DIST, f)));
+  const cfgPath = path.join(ROOT, 'site.config.json');
+  const cfg = fs.existsSync(cfgPath) ? JSON.parse(fs.readFileSync(cfgPath, 'utf8')) : {};
+  const siteUrl = (process.env.SITE_URL || cfg.siteUrl || '').replace(/\/+$/, '');
+  const gsc = (cfg.googleVerification || '').trim();
+
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8')
+    .replace(/__SITE_URL__/g, siteUrl)
+    .replace('<!--GSC_VERIFICATION-->', gsc ? `<meta name="google-site-verification" content="${gsc}">` : '');
+  fs.writeFileSync(path.join(DIST, 'index.html'), html);
+  ['styles.css', 'script.js'].forEach(f => fs.copyFileSync(path.join(ROOT, f), path.join(DIST, f)));
+
+  // SEO : robots.txt + sitemap.xml (+ fichier de vérification Google éventuel)
+  fs.writeFileSync(path.join(DIST, 'robots.txt'),
+    `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`);
+  fs.writeFileSync(path.join(DIST, 'sitemap.xml'),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    `  <url><loc>${siteUrl}/</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n</urlset>\n`);
+  for (const f of fs.readdirSync(ROOT)) {
+    if (/^google[0-9a-f]+\.html$/i.test(f)) fs.copyFileSync(path.join(ROOT, f), path.join(DIST, f));
+  }
   copyRecursive(path.join(ROOT, 'assets'), path.join(DIST, 'assets'));
 
   const manifest = {};

@@ -49,7 +49,7 @@ photos/
   animal/ ...
 ```
 
-- Formats : `.jpg`, `.jpeg`, `.png`, `.webp`, `.heic`.
+- Formats : `.jpg`, `.jpeg`, `.png`, `.webp`. (Les `.heic` d'iPhone ne sont pas toujours lisibles : exporte-les en JPG.)
 - Dans une série, les photos sont triées par nom (`01.jpg` avant `02.jpg`) ;
   la première sert de couverture.
 - Les photos gardent leur format d'origine (portrait / paysage), sans recadrage.
@@ -86,3 +86,19 @@ scripts/build.js                    optimisation + manifest.json → dist/
 package.json                        dépendance : sharp
 .github/workflows/deploy.yml        build + déploiement GitHub Pages
 ```
+
+## Référencement (SEO)
+
+- `site.config.json` : `siteUrl` = adresse publique du site (mets ton domaine Porkbun
+  une fois branché, ex. `https://tondomaine.com`) ; `googleVerification` = code de la
+  balise Search Console (voir ci-dessous).
+- Le build génère automatiquement `robots.txt` et `sitemap.xml`.
+- Un fichier `googleXXXX.html` (méthode « fichier HTML » de Google) placé à la racine
+  du dépôt est copié tel quel sur le site.
+
+### Search Console
+1. https://search.google.com/search-console → « Ajouter une propriété ».
+2. Domaine perso : « Domaine » + enregistrement TXT chez Porkbun (DNS) ; sinon
+   « Préfixe d'URL » + méthode « Balise HTML » : copie uniquement la valeur de `content="…"`
+   dans `googleVerification`, push, puis « Valider ».
+3. Menu « Sitemaps » → saisis `sitemap.xml` → Envoyer.
