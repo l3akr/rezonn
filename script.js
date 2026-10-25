@@ -59,6 +59,8 @@ const FRAME_CLASSES = ['f-a', 'f-b', 'f-c', 'f-d'];
 /* formats par défaut des placeholders (largeur / hauteur), tant qu'aucune vraie
    photo n'est présente — remplacés par le format réel dès qu'une photo charge */
 const RATIO_MAP = { 'f-a': 3 / 4, 'f-b': 16 / 10, 'f-c': 1, 'f-d': 4 / 3 };
+/* boutique : passe à false quand les tirages sont prêts à la vente */
+const PRINTS_SOON = true;
 const FLAT_CATEGORIES = ['archives'];
 const INSTAGRAM_URL = 'https://www.instagram.com/re__zonn/';
 
@@ -197,12 +199,23 @@ function renderMenuGrid() {
 
 function catTile(key, label, index) {
   let cover = null;
-  if (key === 'prints') cover = PRINTS_DATA[0] ? PRINTS_DATA[0].image : null;
-  else if (DATA[key]) cover = categoryCover(key);
+  let tone = key;
+  let soon = '';
+  if (key === 'prints') {
+    if (PRINTS_SOON) {
+      tone = 'contact';               // même fond que la tuile CONTACT
+      soon = '<span class="cat-tile-soon">BIENTÔT</span>';
+    } else {
+      cover = PRINTS_DATA[0] ? PRINTS_DATA[0].image : null;
+    }
+  } else if (DATA[key]) {
+    cover = categoryCover(key);
+  }
 
   return `
     <a href="#/${key}" class="cat-tile c-${key}" data-nav>
-      ${media(cover, key, index, 'thumb')}
+      ${media(cover, tone, cover ? index : '', 'thumb')}
+      ${soon}
       <span class="cat-tile-label">${label}</span>
     </a>
   `;
@@ -292,6 +305,15 @@ function seriesItem(tone, series, i) {
 }
 
 function renderPrints() {
+  if (PRINTS_SOON) {
+    app.innerHTML = `
+      <div class="view soon-view">
+        <h1 class="cat-title">PRINTS</h1>
+        <p class="soon-word">BIENTÔT</p>
+      </div>
+    `;
+    return;
+  }
   app.innerHTML = `
     <div class="view">
       <div class="cat-header">
