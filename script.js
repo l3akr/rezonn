@@ -489,3 +489,14 @@ window.addEventListener('DOMContentLoaded', async () => {
   router();
   document.getElementById('loader').classList.add('is-hidden');
 });
+
+/* Anti-téléchargement : pas de clic droit, glisser-déposer, appui long sur les photos */
+(function () {
+  const isImg = e => e.target && e.target.closest && e.target.closest('img, .frame, .cat-tile, .series-cover, .print-visual, .lightbox');
+  document.addEventListener('contextmenu', e => { if (isImg(e)) e.preventDefault(); });
+  document.addEventListener('dragstart', e => { if (isImg(e) || (e.target && e.target.tagName === 'IMG')) e.preventDefault(); });
+  document.addEventListener('keydown', e => {
+    const k = (e.key || '').toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && (k === 's' || k === 'u')) e.preventDefault();
+  });
+})();

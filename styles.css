@@ -680,3 +680,7 @@ img{ max-width:100%; display:block; }
 /* SEO */
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .seo-text{max-width:720px;margin:0 auto;padding:40px 20px 0;text-align:center;color:var(--fg-faint);font-family:'Inter',sans-serif;font-weight:300;font-size:13px;line-height:1.7}
+
+/* Anti-téléchargement (dissuasif) */
+img, .ph, .frame, .cat-tile, .series-cover { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; -webkit-user-drag:none; }
+.shot-img, .frame img, .cat-tile img, .series-cover img, .print-visual img { pointer-events:none; }
